@@ -11,7 +11,7 @@ import Login from "./Login";
 import Footer from "./Footer";
 import axios from "axios";
 
-axios.defaults.baseURL = "http://localhost:5000";
+axios.defaults.baseURL = "https://notesapp-2948.onrender.com";
 
 var Router = () => {
   return (
