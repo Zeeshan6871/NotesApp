@@ -13,19 +13,19 @@ import { useHistory } from "react-router-dom";
 
 var Register = () => {
   const [user, setUser] = useState({ fullname: "", email: "", password: "" });
-  const notify = (message) =>
-      toast.warn(message);
+  const [loading, setLoading] = useState(false);
+
+  const notify = (message) => toast.warn(message);
   const history = useHistory();
 
   function createNotes(userId) {
     const notesArray = [];
-    const myNotes = {   
+    const myNotes = {
       userId: userId,
       notes: notesArray,
     };
 
-    axios
-      .post("/notes/add", myNotes)
+    axios.post("/notes/add", myNotes);
   }
 
   function handleLogin(e) {
@@ -34,23 +34,30 @@ var Register = () => {
       email: user.email,
       password: user.password,
     };
-
+    setLoading(true);
     axios
       .post("/users/findOne", myUser)
       .then((res) => {
         if (res.data.success) {
-          setInStorage("notekeeper", { token: res.data.token, fullname: res.data.fullname });
+          setInStorage("notekeeper", {
+            token: res.data.token,
+            fullname: res.data.fullname,
+          });
           createNotes(res.data.userId);
-          history.push('/');
+          history.push("/");
         }
+        setLoading(false);
       })
-      .catch((err) => console.log("Error :" + err));
+      .catch((err) => {
+        setLoading(false);
+        console.log("Error :" + err);
+      });
   }
 
   function handleRegister(e) {
     e.preventDefault();
 
-    if(user.email === "" || user.fullname === "" || user.password === "") {
+    if (user.email === "" || user.fullname === "" || user.password === "") {
       notify("Fill out all the fields!");
       return;
     }
@@ -64,11 +71,9 @@ var Register = () => {
     axios
       .post("/users/add", myUser)
       .then((res) => {
-
         if (res.data.success) {
           notify(res.data.message);
           handleLogin(e);
-         
         } else {
           notify(res.data.message);
           setUser({ fullname: "", email: "", password: "" });
@@ -86,7 +91,7 @@ var Register = () => {
   return (
     <div>
       <Header link="/login" linkText="Login" />
-      <Welcome headerText="Keep your notes with NoteKeeper!"/>
+      <Welcome headerText="Keep your notes with NoteKeeper!" />
       <form className="login" onSubmit={handleRegister}>
         <h1 className="login"> Sign Up </h1>
         <TextField
@@ -111,8 +116,12 @@ var Register = () => {
           type="password"
         />
         {/* <Link to="/"> */}
-        <button type="submit" alt="Login">
-          <AssignmentTurnedInIcon fontSize="large" />
+        <button type="submit" alt="Login" disabled={loading}>
+          {loading ? (
+            <p>Loading...</p>
+          ) : (
+            <AssignmentTurnedInIcon fontSize="large" />
+          )}
         </button>
         {/* </Link> */}
         <div>

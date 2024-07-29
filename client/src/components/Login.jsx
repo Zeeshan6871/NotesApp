@@ -13,13 +13,13 @@ import { useHistory } from "react-router-dom";
 
 var Login = () => {
   const [user, setUser] = useState({ email: "", password: "" });
-  const notify = (message) =>  toast.warn(message);
+  const notify = (message) => toast.warn(message);
   const history = useHistory();
-
+  const [loading, setLoading] = useState(false);
   function handleLogin(e) {
     e.preventDefault();
 
-    if(user.email === "" || user.password === "") {
+    if (user.email === "" || user.password === "") {
       notify("Fill out all the fields!");
       return;
     }
@@ -28,20 +28,28 @@ var Login = () => {
       email: user.email,
       password: user.password,
     };
-
+    setLoading(true);
     axios
       .post("/users/findOne", myUser)
       .then((res) => {
         if (res.data.success) {
-          setInStorage("notekeeper", { token: res.data.token, fullname: res.data.fullname });
+          setLoading(false);
+          setInStorage("notekeeper", {
+            token: res.data.token,
+            fullname: res.data.fullname,
+          });
           notify(res.data.message);
-          setTimeout(history.push("/"),2000);
+          setTimeout(history.push("/"), 2000);
         } else {
+          setLoading(false);
           notify(res.data.message);
-          setUser({email: "", password: ""});
+          setUser({ email: "", password: "" });
         }
       })
-      .catch((err) => console.log("Error :" + err));
+      .catch((err) => {
+        setLoading(false);
+        console.log("Error :" + err);
+      });
   }
 
   function handleChange(e) {
@@ -51,7 +59,7 @@ var Login = () => {
   return (
     <div>
       <Header link="/register" linkText="Register" />
-      <Welcome headerText="Keep your notes with NoteKeeper!"/>
+      <Welcome headerText="Keep your notes with NoteKeeper!" />
       <form className="login" onSubmit={handleLogin}>
         <h1 className="login"> Sign In </h1>
         <TextField
@@ -68,8 +76,8 @@ var Login = () => {
           placeholder="Password"
           type="password"
         />
-        <button type="submit" alt="Login">
-          <LoginIcon fontSize="large" />
+        <button type="submit" alt="Login" disabled={loading}>
+          {loading ? <p>Loading...</p> : <LoginIcon fontSize="large" />}
         </button>
         <div>
           <p>
