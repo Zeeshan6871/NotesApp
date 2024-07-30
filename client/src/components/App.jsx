@@ -40,13 +40,12 @@ var App = (props) => {
               history.push("/login");
             }
           })
-          .catch((err) => {
-          });
-          return () => ac.abort();
+          .catch((err) => {});
+        return () => ac.abort();
       } else {
         history.push("/login");
       }
-    };
+    }
     getToken();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -75,7 +74,6 @@ var App = (props) => {
         notify();
       })
       .catch((err) => console.log("Error : " + err));
-
   }
 
   function getNotes(userId) {
@@ -88,7 +86,6 @@ var App = (props) => {
   }
 
   function logout() {
-
     axios
       .get("/users/logout?token=" + token)
       .then((res) => {
@@ -111,20 +108,20 @@ var App = (props) => {
   return (
     <div>
       <Header link="/login" linkText="Logout" handleClick={logout} />
-      <Welcome headerText={"Welcome to NoteKeeper, " +  fullname  + "!"}  />
+      <Welcome headerText={"Welcome to NoteKeeper, " + fullname + "!"} />
       <CreateArea onAdd={addNote} />
-
-      {(notes.length > 0 || typeof notes === "undefined") &&
-        notes.map((note, index) => (
-          <Note
-            key={index}
-            id={index}
-            title={note.title}
-            content={note.content}
-            onDelete={deleteNote}
-          />
-        ))}
-
+      <div className="notes">
+        {(notes.length > 0 || typeof notes === "undefined") &&
+          notes.map((note, index) => (
+            <Note
+              key={index}
+              id={index}
+              title={note.title}
+              content={note.content}
+              onDelete={deleteNote}
+            />
+          ))}
+      </div>
       <Footer />
       <div className="saveFab" onClick={saveNotes}>
         <Tooltip title="Save Notes" aria-label="save">
